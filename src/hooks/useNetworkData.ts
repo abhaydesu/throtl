@@ -50,7 +50,7 @@ const normalizeDevices = (payload: BackendStatsPayload): BackendDevice[] => {
 };
 
 export const THRESHOLD_BPS = 1_600_000 * 8;
-export const DEFAULT_THROTTLE_LIMIT_MBPS = 2;
+export const DEFAULT_THROTTLE_LIMIT_MBPS = 5;
 
 export function useNetworkData() {
   const [clients, setClients] = useState<Client[]>([]);
@@ -343,13 +343,12 @@ export function useNetworkData() {
         setClients(processedClients);
       }
 
-      setSelectedClientIp((currentSelected) => {
-        if (activeClients.length === 0) return null;
-        if (!currentSelected) return activeClients[0].ip;
-        if (!activeClients.some((client) => client.ip === currentSelected)) {
-          return activeClients[0].ip;
+      setSelectedClientIp(currentSelected => {
+        if (!currentSelected) return null;
+        if (activeClients.some(client => client.ip === currentSelected)) {
+          return currentSelected;
         }
-        return currentSelected;
+        return null;
       });
 
       const totalDownBps =
